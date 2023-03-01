@@ -1,4 +1,4 @@
-# Original Author: Lonnie Clifton
+# Original Author: Bonnie Clifton
 
 import time
 import config
