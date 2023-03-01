@@ -1,6 +1,6 @@
 # Original Author: Lonnie Clifton
 
-import time
+import tim
 import config
 import RPi.GPIO as GPIO
 
