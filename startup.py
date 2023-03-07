@@ -6,12 +6,12 @@
 
 #broker ="mqtt.eclipseprojects.io" 
 broker ="test.mosquitto.org"
-#broker ="127.0.0.1" 
+#broker ="192.168.2.158" 
+
 
 import paho.mqtt.client as mqtt
 import time
 from callbacks import *
-import Library as lib
 
 def PublishMessage(topic, msg):
 	topic = 'elevEV/' + topic
