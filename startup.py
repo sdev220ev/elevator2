@@ -31,7 +31,6 @@ def on_message_elevator(client, userdata, msg):
 	#print('Received a new  data ', msg.payload.decode('utf-8'))
 	#print("message qos=",msg.qos)
 	#print("message retain flag=",msg.retain)
-	print ('$$$$$$$$$')
 	payload = msg.payload.decode('utf-8')
 	topic = msg.topic
 	print('MQTT sub: ' + topic.ljust(25," "), payload.ljust(20," "))
