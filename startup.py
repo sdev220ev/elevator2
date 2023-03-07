@@ -13,6 +13,10 @@ import paho.mqtt.client as mqtt
 import time
 from callbacks import *
 
+from getmac import get_mac_address as gma
+mac = gma()
+print(mac)
+
 def PublishMessage(topic, msg):
 	topic = 'elevEV/' + topic
 	result = client.publish(topic, msg)
@@ -26,7 +30,7 @@ def PublishMessage(topic, msg):
 	#msg_count += 1
 	print("Topic: " + topic + "   Message: " + msg)
 
-def on_message_elevator(client, userdata, msg):
+def on_message(client, userdata, msg):
 	#callback when a new message is posted on MQTT server
 	#print('Received a new  data ', msg.payload.decode('utf-8'))
 	#print("message qos=",msg.qos)
@@ -44,6 +48,16 @@ def on_connect(client, userdata, flags, rc):
 		print("Connected to MQTT Broker!")
 	else:
 		print("Failed to connect, return code %d\n", rc)	
+
+def on_connect(client, userdata, flags, rc):
+	if rc==0:
+		print ("Callback: connected ok")
+	else:
+		print ("bad connection Return code: ". rc)		
+
+def on_disconnect(client, userdata, flags, rc):
+	if rc==0:
+		print ("Callback: Disconnected. Code: " + str(rc))
 		
 client = mqtt.Client("elevator")
 client.on_connect = on_connect
@@ -57,29 +71,8 @@ client.loop_start()
 
 while True:
 	#PublishMessage('holdcardoor', 'holdaaaa')
-	client.publish(lib.SYSTEMID() + '/' + 'holdCarDoor', 'holdaa')
+	client.publish(mac + '/' + 'holdCarDoor', 'holdaa')
 	time.sleep(3)
-
-
-
-
-def on_message_house(client, userdata, msg):
-	#print('Received a new  data ', msg.payload.decode('utf-8'))
-	payload = msg.payload.decode('utf-8')
-	topic = msg.topic
-	print(topic, payload)
-	#print("message qos=",msg.qos)
-	#print("message retain flag=",msg.retain)
 	
-def on_log(client, userdata, level, buf):
-	print ("log: " + buf)
 
-def on_connect(client, userdata, flags, rc):
-	if rc==0:
-		print ("Callback: connected ok")
-	else:
-		print ("bad connection Return code: ". rc)
 
-def on_disconnect(client, userdata, flags, rc):
-	if rc==0:
-		print ("Callback: Disconnected. Code: " + str(rc))
