@@ -26,7 +26,7 @@ def PublishMessage(topic, msg):
 	if status == 0:
 		print("Send " + msg + " to topic " + topic)
 	else:
-		print(f"Failed to send message to topic {topic}")
+		print("Failed to send message to topic " + topic)
 	#msg_count += 1
 	print("Topic: " + topic + "   Message: " + msg)
 
