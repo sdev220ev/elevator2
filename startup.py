@@ -8,7 +8,6 @@
 #broker ="test.mosquitto.org"
 broker ="127.0.0.1" 
 
-
 import paho.mqtt.client as mqtt
 import time
 # from callbacks import *
