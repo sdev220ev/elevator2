@@ -5,8 +5,8 @@
 # mosquitto-2.0.15-install-windows-x64.exe 
 
 #broker ="mqtt.eclipseprojects.io" 
-broker ="test.mosquitto.org"
-#broker ="192.168.2.158" 
+#broker ="test.mosquitto.org"
+broker ="127.0.0.1" 
 
 
 import paho.mqtt.client as mqtt
@@ -16,15 +16,18 @@ import time
 from getmac import get_mac_address as gma
 mac = gma()
 print(mac)
+ID = mac[-5:]
+print (ID)
 
 def PublishMessage(topic, msg):
-	topic = 'elevEV/' + topic
+	topic = ID + '/' + topic
 	result = client.publish(topic, msg)
 	# result: [0, 1]
 	print (result)
 	status = result[0]
+	time.sleep(.5)
 	if status == 0:
-		print("Send " + msg + " to topic " + topic)
+		print("Sent " + msg + " to topic " + topic)
 	else:
 		print("Failed to send message to topic " + topic)
 	#msg_count += 1
@@ -37,7 +40,25 @@ def on_message(client, userdata, msg):
 	#print("message retain flag=",msg.retain)
 	payload = msg.payload.decode('utf-8')
 	topic = msg.topic
-	print('MQTT sub: ' + topic.ljust(25," "), payload.ljust(20," "))
+	print('MQTT send: ' + topic.ljust(25," "), payload.ljust(20," "))
+
+	if topic == ID + '/reset':
+		print ('got reset command: ' + payload)
+		PublishMessage( 'status1', 'resetting')
+		time.sleep(5)
+		PublishMessage('status2', 'bottom')
+		time.sleep(5)
+		PublishMessage( 'status3', 'top')
+		time.sleep(5)
+		PublishMessage('status4', 'bottom2')
+		
+
+	elif topic == ID + '/move':
+		print ('got move command: ' + payload)
+		PublishMessage(ID + '/move', 'complete')
+	elif topic == ID + '/speed':
+		print ('got speed command: ' + payload)
+
 
 	# Check for topics and commands to control the elevator
 	#system, ID, topic = topic.split('/')
@@ -62,17 +83,23 @@ def on_disconnect(client, userdata, flags, rc):
 client = mqtt.Client("elevator")
 client.on_connect = on_connect
 
-#client.message_callback_add('elevEV/#', on_message_elevator)
+client.message_callback_add(ID + '/#', on_message)
 client.connect(broker)
-client.subscribe('elevEV/#')
+client.subscribe(ID +'/#')
 
 print ("starting loop as new thread")
 client.loop_start()
 
 while True:
 	#PublishMessage('holdcardoor', 'holdaaaa')
-	client.publish(mac + '/' + 'holdCarDoor', 'holdaa')
+	#client.publish(mac + '/' + 'holdCarDoor', 'holdaa')
 	time.sleep(3)
-	
+	PublishMessage( 'status', 'resetting')
+	time.sleep(5)
+	PublishMessage('status', 'bottom')
+	time.sleep(5)
+	PublishMessage( 'status', 'top')
+	time.sleep(5)
+	PublishMessage('status', 'bottom2')
 
 
