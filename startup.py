@@ -12,11 +12,13 @@ import paho.mqtt.client as mqtt
 import time
 # from callbacks import *
 
+
 from getmac import get_mac_address as gma
 mac = gma()
 print(mac)
 ID = mac[-5:]
 print (ID)
+
 
 from queue import Queue
 q=Queue()
