@@ -3,13 +3,18 @@
 #  pip install paho-mqtt
 # https://mosquitto.org/download/
 # mosquitto-2.0.15-install-windows-x64.exe 
+import paho.mqtt.client as mqtt
+import time
+import Globals
+import Car
+
+
+from queue import Queue
+q=Queue()
 
 #broker ="mqtt.eclipseprojects.io" 
 #broker ="test.mosquitto.org"
 broker ="127.0.0.1" 
-
-import paho.mqtt.client as mqtt
-import time
 # from callbacks import *
 
 from getmac import get_mac_address as gma
@@ -17,9 +22,6 @@ mac = gma()
 print(mac)
 ID = mac[-5:]
 print (ID)
-
-from queue import Queue
-q=Queue()
 
 def reset(payload):
 	print ('got reset command: ' + payload)
@@ -57,19 +59,6 @@ def on_message(client, userdata, msg):
 	
 	print('MQTT send: ' + topic.ljust(25," "), payload.ljust(20," "))
 
-	if topic == ID + '/reset':
-		q.put(msg)
-
-	elif topic == ID + '/move':
-		print ('got move command: ' + payload)
-		PublishMessage(ID + '/move', 'complete')
-	elif topic == ID + '/speed':
-		print ('got speed command: ' + payload)
-
-
-	# Check for topics and commands to control the elevator
-	#system, ID, topic = topic.split('/')
-	#topic = topic.lower()
 
 def on_connect(client, userdata, flags, rc):
 	if rc == 0:
@@ -98,16 +87,45 @@ print ("starting loop as new thread")
 client.loop_start()
 
 while True:
-	#PublishMessage('holdcardoor', 'holdaaaa')
-	#client.publish(mac + '/' + 'holdCarDoor', 'holdaa')
-	time.sleep(3)
+	time.sleep(.2)
 	while not q.empty():
 		msg = q.get()
 		if msg is None:
 			continue
-		print("received from queue",str(msg.payload.decode("utf-8")))
+		print("received from queue",str(msg.payload.decode("utf-8")))		
 		payload = msg.payload.decode('utf-8')
 		topic = msg.topic
-		reset(payload)
+		payload = msg.payload.decode('utf-8')
+		topic = msg.topic
 
-		
+	if topic == ID + '/reset':
+		reset(payload)
+		print ('got reset command: ' + payload)
+	elif topic == ID + '/MoveCar':
+		steps = int(payload)
+		MoveCar(payload)
+		print ('got move command: ' + payload)
+		PublishMessage(ID + '/move', 'complete')
+	elif topic == ID + '/speed':
+		print ('got speed command: ' + payload)
+
+	elif topic == ID + '/TopFloor':
+		TopFloor = int(payload)
+		print ('got sTopFloor command: ' + str(TopFloor))
+
+	elif topic == ID + '/StepWaitTime':
+		StepWaitTime = float(payload)
+		print ('got sTopFloor command: ' + float(TopFloor))
+
+	elif topic == ID + '/StepCounter':
+		StepCounter = int(payload)
+		print ('got sTopFloor command: ' + int(StepCounter))
+
+
+	elif topic == ID + '/StopNow':
+		if payload = true:
+			Globals.StopNow = True
+		else:
+			Globals.StopNow = False
+		print ('got StopNow command: ' + Globals.StopNow)
+	

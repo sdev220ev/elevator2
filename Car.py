@@ -6,21 +6,23 @@ import RPi.GPIO as GPIO
 
 from StepperDriverClass import StepperDriverClass
 
-def CarManager():
-	# The stepper driver is a class. Create an instance for the lift stepper motor and one for the door stepper motor.
-	Car = StepperDriverClass(id, [31,29,7,5], 26, 24 ) # Create an instance of the stepper motor driver.
-	
-	
-	# Begin car intialization to find the stepper motor steps required to move the car to the top floor
-	# Bottom floor is like a reference position
+# The stepper driver is a class. Create an instance for the lift stepper motor and one for the door stepper motor.
+Car = StepperDriverClass(id, [31,29,7,5], 26, 24 ) # Create an instance of the stepper motor driver.
+
+def MoveCar(steps):
+
 	print ('CarManager: Moving to bottom floor')
-	Car.moveMotor(-1000000)
-	time.sleep(.5)
+	Car.moveMotor(steps)
+	return 
 	
 	print ('CarManager: Moving to top floor to count steps')
 	# Will stop when car reaches limit switch.
-	totalSteps = Car.moveMotor(1000000)
-	
+	return Car.moveMotor(1000000)
+
+
+
+
+'''
 	#the total steps is a measure of the distance from the bottom to the top floor
 	#  Used to find the number of steps to a given floor (no detection device at each floor)
 	print ("CarManager: Total steps: ", totalSteps)
@@ -76,3 +78,4 @@ def CarManager():
 		if floor < bottomFloor + 1: 
 			direction = 1
 		time.sleep(1)
+'''
