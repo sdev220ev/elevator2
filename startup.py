@@ -18,6 +18,19 @@ print(mac)
 ID = mac[-5:]
 print (ID)
 
+from queue import Queue
+q=Queue()
+
+def reset(payload):
+	print ('got reset command: ' + payload)
+	PublishMessage( 'status1', 'resetting')
+	time.sleep(5)
+	PublishMessage('status2', 'bottom')
+	time.sleep(5)
+	PublishMessage( 'status3', 'top')
+	time.sleep(5)
+	PublishMessage('status4', 'bottom2')
+
 def PublishMessage(topic, msg):
 	topic = ID + '/' + topic
 	result = client.publish(topic, msg)
@@ -39,18 +52,13 @@ def on_message(client, userdata, msg):
 	#print("message retain flag=",msg.retain)
 	payload = msg.payload.decode('utf-8')
 	topic = msg.topic
+
+	
+	
 	print('MQTT send: ' + topic.ljust(25," "), payload.ljust(20," "))
 
 	if topic == ID + '/reset':
-		print ('got reset command: ' + payload)
-		PublishMessage( 'status1', 'resetting')
-		time.sleep(5)
-		PublishMessage('status2', 'bottom')
-		time.sleep(5)
-		PublishMessage( 'status3', 'top')
-		time.sleep(5)
-		PublishMessage('status4', 'bottom2')
-		
+		q.put(msg)
 
 	elif topic == ID + '/move':
 		print ('got move command: ' + payload)
@@ -93,12 +101,11 @@ while True:
 	#PublishMessage('holdcardoor', 'holdaaaa')
 	#client.publish(mac + '/' + 'holdCarDoor', 'holdaa')
 	time.sleep(3)
-	PublishMessage( 'status', 'resetting')
-	time.sleep(5)
-	PublishMessage('status', 'bottom')
-	time.sleep(5)
-	PublishMessage( 'status', 'top')
-	time.sleep(5)
-	PublishMessage('status', 'bottom2')
-
-
+	while not q.empty():
+		msg = q.get()
+		if msg is None:
+			continue
+		print("received from queue",str(msg.payload.decode("utf-8")))
+		payload = msg.payload.decode('utf-8')
+		topic = msg.topic
+		reset(payload)
