@@ -19,7 +19,6 @@ print(mac)
 ID = mac[-5:]
 print (ID)
 
-
 from queue import Queue
 q=Queue()
 
