@@ -109,3 +109,5 @@ while True:
 		payload = msg.payload.decode('utf-8')
 		topic = msg.topic
 		reset(payload)
+
+		
