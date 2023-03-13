@@ -54,11 +54,8 @@ def on_message(client, userdata, msg):
 	#print("message retain flag=",msg.retain)
 	payload = msg.payload.decode('utf-8')
 	topic = msg.topic
-
-	
 	
 	print('MQTT send: ' + topic.ljust(25," "), payload.ljust(20," "))
-
 
 def on_connect(client, userdata, flags, rc):
 	if rc == 0:
@@ -101,11 +98,13 @@ while True:
 	if topic == ID + '/reset':
 		reset(payload)
 		print ('got reset command: ' + payload)
+
 	elif topic == ID + '/MoveCar':
 		steps = int(payload)
-		MoveCar(payload)
+		Car.MoveCar(payload)
 		print ('got move command: ' + payload)
 		PublishMessage(ID + '/move', 'complete')
+
 	elif topic == ID + '/speed':
 		print ('got speed command: ' + payload)
 
@@ -117,13 +116,12 @@ while True:
 		StepWaitTime = float(payload)
 		print ('got sTopFloor command: ' + float(TopFloor))
 
-	elif topic == ID + '/StepCounter':
-		StepCounter = int(payload)
-		print ('got sTopFloor command: ' + int(StepCounter))
-
+	elif topic == ID + '/CurrentStepPosition':
+		Globals.CurrentStepPosition = int(payload)
+		print ('got sTopFloor command: ' + str(Globals.CurrentStepPosition))
 
 	elif topic == ID + '/StopNow':
-		if payload = true:
+		if payload == True:
 			Globals.StopNow = True
 		else:
 			Globals.StopNow = False
